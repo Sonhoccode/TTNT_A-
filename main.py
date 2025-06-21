@@ -36,7 +36,7 @@ COLOR_SCROLLBAR_BG = (70, 70, 70)
 
 # Su kien cho viec dieu khien toc do animation
 ANIMATION_EVENT = pygame.USEREVENT + 1
-ANIMATION_SPEED_MS = 25
+ANIMATION_SPEED_MS = 15
 
 # ===================================================================================
 # PHAN 2: CAC HAM VE VA GIAO DIEN

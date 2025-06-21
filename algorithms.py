@@ -7,7 +7,7 @@ from collections import deque
 # ===================================================================================
 
 # Kich thuoc me cung (so hang, so cot)
-ROWS, COLS = 10, 10
+ROWS, COLS = 20, 20
 
 # Huong: (dx, dy, tuong hien tai, tuong doi dien)
 # Tuong: 0: tren, 1: phai, 2: duoi, 3: trai
@@ -30,12 +30,33 @@ def generate_maze_recursive(x, y, maze, visited):
             generate_maze_recursive(nx, ny, maze, visited)
 
 def create_new_maze():
-    """Tao ra mot me cung moi hoan chinh voi diem bat dau/ket thuc ngau nhien"""
+    """Tao ra mot me cung moi voi nhieu duong di"""
+    # Buoc 1: Tao ra mot me cung hoan hao (chi co 1 duong di)
     maze = [[[True, True, True, True] for _ in range(COLS)] for _ in range(ROWS)]
     visited = [[False] * COLS for _ in range(ROWS)]
     start_gen_x, start_gen_y = random.randint(0, ROWS - 1), random.randint(0, COLS - 1)
     generate_maze_recursive(start_gen_x, start_gen_y, maze, visited)
-    
+
+    # === THAY DOI QUAN TRONG: DUC THEM TUONG DE TAO NHIEU DUONG DI ===
+    # Ti le cac buc tuong se bi go bo them (cang cao, cang nhieu duong di)
+    # 0.2 co nghia la khoang 20% cac buc tuong ben trong se bi pha bo
+    wall_removal_chance = 0.20 
+    for r in range(ROWS):
+        for c in range(COLS):
+            # Chi duc tuong ben trong, khong duc tuong bien
+            # Duc tuong ngang (tuong duoi)
+            if r < ROWS - 1:
+                if random.random() < wall_removal_chance:
+                    maze[r][c][2] = False  # Go bo tuong duoi cua o hien tai
+                    maze[r+1][c][0] = False # Go bo tuong tren cua o phia duoi
+
+            # Duc tuong doc (tuong phai)
+            if c < COLS - 1:
+                if random.random() < wall_removal_chance:
+                    maze[r][c][1] = False # Go bo tuong phai cua o hien tai
+                    maze[r][c+1][3] = False # Go bo tuong trai cua o ben phai
+
+    # Buoc 3: Chon diem bat dau va ket thuc
     start_pos = (random.randint(0, ROWS - 1), random.randint(0, COLS - 1))
     while True:
         end_pos = (random.randint(0, ROWS - 1), random.randint(0, COLS - 1))
@@ -44,7 +65,7 @@ def create_new_maze():
     return maze, start_pos, end_pos
 
 # ===================================================================================
-# PHAN 2: CAC THUAT TOAN TIM DUONG (DA CHUYEN THANH GENERATOR)
+# PHAN 2: CAC THUAT TOAN TIM DUONG (Khong thay doi)
 # ===================================================================================
 
 class Node:
@@ -78,7 +99,6 @@ def reconstruct_path(current_node):
         current_node = current_node.parent
     return path[::-1] # Dao nguoc de co duong di tu start -> end
 
-# Moi ham thuat toan se `yield` de co the truc quan hoa tung buoc
 def a_star_animated(maze, start, goal):
     start_node = Node(start)
     open_list = []
@@ -101,7 +121,7 @@ def a_star_animated(maze, start, goal):
             if any(n.position == neighbor_pos and neighbor_node.g >= n.g for n in open_list):
                 continue
             heapq.heappush(open_list, neighbor_node)
-    yield closed_set, None # Khong tim thay
+    yield closed_set, None
 
 def bfs_animated(maze, start, goal):
     queue = deque([Node(start)])
@@ -123,7 +143,7 @@ def bfs_animated(maze, start, goal):
                 visited.add(neighbor_pos)
                 parent_map[neighbor_pos] = current_node.position
                 queue.append(Node(neighbor_pos))
-    yield visited, None # Khong tim thay
+    yield visited, None
 
 def dfs_animated(maze, start, goal):
     stack = [Node(start)]
@@ -146,4 +166,4 @@ def dfs_animated(maze, start, goal):
             if neighbor_pos not in visited:
                 parent_map[neighbor_pos] = current_node.position
                 stack.append(Node(neighbor_pos))
-    yield visited, None # Khong tim thay
+    yield visited, None
