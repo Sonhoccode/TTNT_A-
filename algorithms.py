@@ -167,3 +167,7 @@ def dfs_animated(maze, start, goal):
                 parent_map[neighbor_pos] = current_node.position
                 stack.append(Node(neighbor_pos))
     yield visited, None
+
+
+
+
